@@ -1,17 +1,45 @@
-import { useEffect, useState } from 'react'
-import { useTheme } from '../../context/ThemeContext.jsx'
+import { useEffect, useRef } from 'react';
+import { useTheme } from '../../context/ThemeContext.jsx';
 
-function SearchForm() {
-    const [search, setSearch] = useState('')
+function SearchForm({ search, setSearch, onSearch }) {
     const { theme } = useTheme()
+    const inputRef = useRef(null)
+
     useEffect(() => {
-        console.log('Search term mounted:', search);
-        // You can add any side effects here, like fetching data based on the search term
-    }, [search])
+        const handleKeyDown = e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                onSearch(search);
+            }
+        }
+
+        const inputElement = inputRef.current;
+        if (inputElement) {
+            inputElement.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            if (inputElement) {
+                inputElement.removeEventListener('keydown', handleKeyDown);
+            }
+        }
+    }, [search, onSearch]);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus()
+        }
+    })
+
+    const handleSubmit = e => {
+        e.preventDefault();
+        onSearch(search);
+    }
 
     return (
-        <form onSubmit={e => { e.preventDefault() /* handle search logic here */ }} className="flex items-center">
+        <form onSubmit={handleSubmit} className="flex items-center">
             <input
+                ref={inputRef}
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -24,10 +52,10 @@ function SearchForm() {
             />
             <button
                 type="submit"
-                className={`h-11 px-4 rounded-r-md flex items-center transition-colors
+                className={`h-11 px-4 rounded-r-md flex items-center transition-colors border
                     ${theme === 'dark'
-                        ? 'bg-blue-800 hover:bg-blue-700 text-gray-00'
-                        : 'bg-blue-500 hover:bg-blue-500 text-gray-900'
+                        ? 'bg-blue-800 hover:bg-blue-700 text-gray-100 border-gray-600'
+                        : 'bg-blue-500 hover:bg-blue-500 text-gray-900 border-gray-300'
                     }`}
                 aria-label="Search"
             >
