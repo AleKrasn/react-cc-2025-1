@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from '../../context/ThemeContext.jsx'
 import Cards from '../Cards/Cards.jsx'
 import SearchForm from '../SearchForm/SearchForm.jsx'
@@ -9,27 +9,42 @@ import Header from './Header.jsx'
 function MainLayout({ children }) {
     const { theme } = useTheme()
     const [search, setSearch] = useState('')
-    const [cards, setCards] = useState([
-        {
-            image: 'https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg',
-            title: 'Chicken Teriyaki',
-            description: 'A delicious chicken teriyaki dish with a sweet and savory sauce.'
-        },
-        {
-            image: 'https://www.themealdb.com/images/media/meals/svprys1511176755.jpg',
-            title: 'Beef Stroganoff',
-            description: 'A classic beef stroganoff with mushrooms and creamy sauce.'
-        }
-    ])
+    const [meals, setMeals] = useState([])
+    const [randomMeals, setRandomMeals] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+
+    // Fetch 10 random meals on mount
+    useEffect(() => {
+        const fetchRandomMeals = async () => {
+            let results = []
+            for (let i = 0; i < 10; i++) {
+                try {
+                    const res = await fetch('https://www.themealdb.com/api/json/v1/1/random.php')
+                    const data = await res.json()
+                    if (data.meals && data.meals[0]) {
+                        const meal = data.meals[0]
+                        results.push({
+                            image: meal.strMealThumb,
+                            title: meal.strMeal,
+                            description: meal.strInstructions?.slice(0, 120) + '...'
+                        })
+                    }
+                } catch (err) {
+                    // Ignore errors for random meals
+                }
+            }
+            setRandomMeals(results)
+        }
+        fetchRandomMeals()
+    }, [])
 
     const handleSearch = async (query) => {
         query = query.trim();
         setSearch(query)
         if (!query) {
+            setMeals([])
             setError(null)
-            // Optionally reset to default cards here
             return
         }
         setLoading(true)
@@ -39,8 +54,7 @@ function MainLayout({ children }) {
             const response = await fetch(url)
             const data = await response.json()
             if (data.meals) {
-                console.log(data)
-                setCards(
+                setMeals(
                     data.meals.map(meal => ({
                         image: meal.strMealThumb,
                         title: meal.strMeal,
@@ -48,11 +62,12 @@ function MainLayout({ children }) {
                     }))
                 )
             } else {
-                setCards([])
-                setError('No meals found.')
+                setMeals([])
+                setError('Sorry No meals found. Please try again or choose from random meals bellow.')
             }
         } catch (err) {
-            setError('Error fetching data.')
+            setMeals([])
+            setError('Error fetching data: ' + err.message)
         } finally {
             setLoading(false)
         }
@@ -73,9 +88,15 @@ function MainLayout({ children }) {
                         <div className="mt-2 text-lg text-gray-500 dark:text-gray-300">Loading...</div>
                     </div>
                 )}
-                {error && <div className="mt-8 text-lg text-red-500">{error}</div>}
+                {error && <div className="mt-8 text-lg mb-8 text-red-100">{error}</div>}
+                {search && !loading && !error && meals.length === 0 && (
+                    <div className="mt-8 text-lg text-gray-500 dark:text-gray-300">No meals found.</div>
+                )}
                 <div className="w-full max-w-7xl">
-                    <Cards cards={cards} />
+                    {search && meals.length > 0
+                        ? <Cards meals={meals} />
+                        : <Cards meals={randomMeals} />
+                    }
                 </div>
                 {children}
             </main>

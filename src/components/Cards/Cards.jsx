@@ -1,14 +1,14 @@
 import Card from '../Card/Card.jsx'
 
-function Cards({ cards }) {
+function Cards({ meals }) {
     return (
         <div className="flex flex-row flex-wrap gap-8 justify-center">
-            {cards.map(card => (
+            {meals.map(meal => (
                 <Card
-                    key={card.title}
-                    image={card.image}
-                    title={card.title}
-                    description={card.description}
+                    key={meal.title}
+                    image={meal.image}
+                    title={meal.title}
+                    description={meal.description}
                 />
             ))}
         </div>
