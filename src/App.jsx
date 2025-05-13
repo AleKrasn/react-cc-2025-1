@@ -1,40 +1,47 @@
-import { useEffect, useState } from 'react'
 import './App.css'
-import ThemeToggle from './components/ThemeToggle.jsx'
+import Card from './components/Card/Card.jsx'
+import MainLayout from './components/layouts/MainLayout.jsx'
+import ThemeToggle from './components/ThemeToggle/ThemeToggle.jsx'
+import { ThemeProvider, useTheme } from './context/ThemeContext.jsx'
 
-function App() {
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('theme')
-    if (saved === 'dark' || saved === 'light') return saved
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark'
-    return 'light'
-  })
+function AppContent() {
+  const { theme, setTheme } = useTheme()
 
-  useEffect(() => {
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  const isDark = theme === 'dark'
+  const cards = [
+    {
+      image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80",
+      title: "Spaghetti Carbonara",
+      description: "Classic Italian pasta dish made with eggs, cheese, pancetta, and pepper. Simple, creamy, and delicious!"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80",
+      title: "Margherita Pizza",
+      description: "Traditional Neapolitan pizza with tomatoes, mozzarella cheese, fresh basil, salt, and extra-virgin olive oil."
+    }
+  ]
 
   return (
-    <div className={`min-h-screen flex items-center justify-center transition-colors relative ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
-      <ThemeToggle theme={theme} setTheme={setTheme} />
-      <div className={`max-w-sm rounded overflow-hidden shadow-lg transition-colors ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-        <img
-          className="w-full h-48 object-cover"
-          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80"
-          alt="Delicious Meal"
-        />
-        <div className="px-6 py-4">
-          <div className={`font-bold text-xl mb-2 transition-colors ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-            Spaghetti Carbonara
-          </div>
-          <p className={`text-base transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-            Classic Italian pasta dish made with eggs, cheese, pancetta, and pepper. Simple, creamy, and delicious!
-          </p>
-        </div>
+    <MainLayout>
+      <div className={`min-h-screen flex items-center justify-center transition-colors relative ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+        <ThemeToggle theme={theme} setTheme={setTheme} />
+        {cards.map(card => (
+          <Card
+            key={card.title}
+            image={card.image}
+            title={card.title}
+            description={card.description}
+          />
+        ))}
       </div>
-    </div>
+    </MainLayout>
+  )
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   )
 }
 

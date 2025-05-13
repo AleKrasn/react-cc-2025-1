@@ -1,4 +1,7 @@
-function ThemeToggle({ theme, setTheme }) {
+import { useTheme } from '../../context/ThemeContext.jsx'
+
+function ThemeToggle() {
+    const { theme, setTheme } = useTheme()
     return (
         <button
             className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 shadow transition-colors"
