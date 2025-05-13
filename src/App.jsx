@@ -1,7 +1,6 @@
 import './App.css'
 import Cards from './components/Cards/Cards.jsx'
 import MainLayout from './components/layouts/MainLayout.jsx'
-import ThemeToggle from './components/ThemeToggle/ThemeToggle.jsx'
 import { ThemeProvider, useTheme } from './context/ThemeContext.jsx'
 
 function AppContent() {
@@ -23,7 +22,6 @@ function AppContent() {
   return (
     <MainLayout>
       <div className={`min-h-screen flex items-center justify-center transition-colors relative ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
-        <ThemeToggle theme={theme} setTheme={setTheme} />
         <Cards cards={cards} />
       </div>
     </MainLayout>
