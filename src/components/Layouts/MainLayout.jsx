@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTheme } from '../../context/ThemeContext.jsx'
 import Cards from '../Cards/Cards.jsx'
 import SearchForm from '../SearchForm/SearchForm.jsx'
+import Spinner from '../Spinner/Spinner.jsx'
 import Footer from './Footer.jsx'
 import Header from './Header.jsx'
 
@@ -77,16 +78,16 @@ function MainLayout({ children }) {
             <Header />
             <div className="w-full flex justify-center mb-4 mt-6 px-2">
                 <div className="w-full max-w-xl flex justify-center">
-                    <SearchForm
-                        onSearch={handleSearch}
-                        search={search}
-                        setSearch={setSearch}
-                        loading={loading}
-                    />
+                    <SearchForm onSearch={handleSearch} search={search} setSearch={setSearch} />
                 </div>
             </div>
             <main className="flex-1 flex flex-col items-center w-full px-4">
-
+                {loading && (
+                    <div className="mt-8 flex flex-col items-center">
+                        <Spinner />
+                        <div className="mt-2 text-lg text-gray-500 dark:text-gray-300">Loading...</div>
+                    </div>
+                )}
                 {error && <div className="mt-8 text-lg mb-8 text-red-100">{error}</div>}
                 {search && !loading && !error && meals.length === 0 && (
                     <div className="mt-8 text-lg text-gray-500 dark:text-gray-300">No meals found.</div>
